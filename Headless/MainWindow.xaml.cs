@@ -20,19 +20,27 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Diagnostics;
+using LiteDB;
 
 namespace Headless
 {
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
 
+
         public MainWindow()
         {
-
             InitializeComponent();
+
+            List<Experience> experiences = new List<Experience>();
+            experiences.Add(new Experience("link 1"));
+            experiences.Add(new Experience("link 12"));
+            experiences.Add(new Experience("link 13"));
+            Library.ItemsSource = experiences;
         }
 
         private void URLField_TextChanged(object sender, TextChangedEventArgs e)
@@ -47,113 +55,46 @@ namespace Headless
         {
             Console.WriteLine("Downloading " + e.Parameter);
 
-            ExperienceDownload download = new ExperienceDownload(e.Parameter.ToString(), DownloadProgressBar);
+            Experience download = new Experience(e.Parameter.ToString());
 
             e.Handled = true;
         }
 
-    }
-
-
-    public class ExperienceDownload
-    {
-        public WebClient Client { get; }
-        public string DownloadLink { get; }
-        public string FileName { get; }
-        public string DownloadSavePath { get; }
-        public string ExtractSavePath { get; }
-        public ProgressBar ViewProgressBar { get; }
-
-        public static readonly string[] Experiences = {
-            "C:/Users/hwray/Documents/Visual Studio 2015/Projects/Headless/Headless/bin/Debug/experiences/het/WindowsNoEditor/TestProject.exe",
-            "C:/Users/hwray/Documents/Visual Studio 2015/Projects/Headless/Headless/bin/Debug/experiences/TPDragons1.3/tpdragons1.3.exe"
-        };
-        public int ExperienceIndex { get; set; }
-        public int NumExperiences { get; }
-
-        public ExperienceDownload(string downloadLink, ProgressBar viewProgressBar)
+        private void Library_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            /*  this.Client = new WebClient();
-              this.DownloadLink = downloadLink;
-              this.ViewProgressBar = viewProgressBar;
 
-              this.FileName = DownloadLink.Split('/').Last();
-              this.DownloadSavePath = "tmp/" + this.FileName;
-              this.ExtractSavePath = "experiences/" + System.IO.Path.GetFileNameWithoutExtension(this.FileName);
-
-
-
-              EnsureSafeSavePath(this.DownloadSavePath);
-
-              this.Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
-              this.Client.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadFinishedCallback);
-              this.Client.DownloadFileAsync(new Uri(DownloadLink), this.DownloadSavePath);
-              */
-            this.ExperienceIndex = -1;
-            this.NumExperiences = Experiences.Count();
-            this.RunNextExperience();
-        }
-
-        private void DownloadProgressCallback(object sender, DownloadProgressChangedEventArgs e)
-        {
-            Console.WriteLine("    downloaded {0} of {1} bytes. {2} % complete...",
-                e.BytesReceived,
-                e.TotalBytesToReceive,
-                e.ProgressPercentage);
-            ViewProgressBar.Value = e.ProgressPercentage;
-            // Should be replaced with a delegate to view controller
-        }
-
-        private void DownloadFinishedCallback(object sender, AsyncCompletedEventArgs e)
-        {
-            Console.WriteLine("Finished downloading and saved at: " + this.DownloadSavePath);
-
-            // try/catch on bad .zip
-            // want to make extracting async
-            Console.WriteLine("Extracting to: " + this.ExtractSavePath);
-            EnsureSafeSavePath(this.ExtractSavePath);
-            ZipFile.ExtractToDirectory(this.DownloadSavePath, this.ExtractSavePath);
-            Console.WriteLine("Finished extracting to: " + this.ExtractSavePath);
-
-           // this.Run();
-        }
-
-        private void Run(string experiencePath)
-        {
-            Console.WriteLine("Running program...");
-            //    Process.Start(this.ExtractSavePath + "/WindowsNoEditor/TestProject.exe");
-            // Console.WriteLine(System.Reflection.Assembly.GetEntryAssembly().Location + "/experiences/het/WindowsNoEditor/TestProject.exe");
-
-            Process p = Process.Start(experiencePath);
-            p.Exited += P_Exited;
-            p.EnableRaisingEvents = true;
-        }
-
-        private void P_Exited(object sender, EventArgs e)
-        {
-            Console.WriteLine("Exited latest program");
-            RunNextExperience();
-        }
-
-        private void RunNextExperience()
-        {
-            ExperienceIndex++;
-            if (ExperienceIndex > NumExperiences - 1)
-            {
-                ExperienceIndex = 0;
-            }
-            Run(Experiences[ExperienceIndex]);
-        }
-
-        private void EnsureSafeSavePath(string downloadSavePath)
-        {
-            System.IO.FileInfo file = new System.IO.FileInfo(downloadSavePath);
-            file.Directory.Create();
-
-            if (File.Exists(downloadSavePath))
-            {
-                Console.WriteLine("File with same name already exists, continuing anyways... will overwrite");
-            }
         }
     }
 }
+
+/*
+
+            // Open database (or create if not exits)
+            using (var db = new LiteDatabase(@"data.db"))
+            {
+                // Get customer collection
+                var customers = db.GetCollection<Customer>("customers");
+
+                // Create your new customer instance
+                var customer = new Customer
+                {
+                    Name = "John Doe",
+                    Phones = new string[] { "8000-0000", "9000-0000" },
+                    IsActive = true
+                };
+
+                // Insert new customer document (Id will be auto-incremented)
+                customers.Insert(customer);
+
+                // Update a document inside a collection
+                customer.Name = "Joana Doe";
+
+                customers.Update(customer);
+
+                // Index document using a document property
+                customers.EnsureIndex(x => x.Name);
+
+                // Use Linq to query documents
+                var results = customers.Find(x => x.Name.StartsWith("Jo"));
+            }
+*/

@@ -18,5 +18,17 @@
         </TextBox>
         <Label x:Name="label" Content="Enter a URL" HorizontalAlignment="Center" Margin="0,9,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
         <ProgressBar x:Name="DownloadProgressBar" HorizontalAlignment="Center" Height="10" Margin="0,80,0,0" VerticalAlignment="Top" Width="100" ValueChanged="DownloadProgressBar_ValueChanged"/>
+       
+        <ListView x:Name="Library" HorizontalAlignment="Left" Height="240" Margin="10,119,0,0" VerticalAlignment="Top" Width="342" SelectionChanged="Library_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+
+
+
     </Grid>
 </Window>
