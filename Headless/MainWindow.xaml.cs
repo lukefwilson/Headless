@@ -21,6 +21,7 @@ using System.Data;
 using System.Drawing;
 using System.Diagnostics;
 using LiteDB;
+using System.Runtime.InteropServices;
 
 namespace Headless
 {
@@ -31,6 +32,8 @@ namespace Headless
     public partial class MainWindow : Window
     {
 
+        public Process vrApp;
+        public Process experience;
 
         public MainWindow()
         {
@@ -41,7 +44,27 @@ namespace Headless
             experiences.Add(new Experience("link 12"));
             experiences.Add(new Experience("link 13"));
             Library.ItemsSource = experiences;
+
         }
+
+
+
+
+        private void P_Exited(object sender, EventArgs e)
+        {
+
+            Console.WriteLine("Experience Closed");
+            BringToFront(this.vrApp);
+
+        }
+
+        private void P_VRExited(object sender, EventArgs e)
+        {
+
+            Console.WriteLine("VR App closed");
+
+        }
+
 
         private void URLField_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -63,6 +86,28 @@ namespace Headless
         private void Library_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+        }
+
+        private void Start_VR_App_Click(object sender, RoutedEventArgs e)
+        {
+            this.vrApp = Process.Start("C:/Users/hwray/Downloads/ovr_sdk_win_1.3.0_public/OculusSDK/Samples/OculusRoomTiny/OculusRoomTiny (DX11)/Bin/Windows/Win32/Debug/VS2015/OculusRoomTiny (DX11).exe");
+            this.vrApp.Exited += P_VRExited;
+            this.vrApp.EnableRaisingEvents = true;
+        }
+
+        private void Start_Experience_Click(object sender, RoutedEventArgs e)
+        {
+            this.experience = Process.Start("C:/Users/hwray/Documents/Visual Studio 2015/Projects/Headless/Headless/bin/Debug/experiences/het/WindowsNoEditor/TestProject.exe");
+            this.experience.Exited += P_Exited;
+            this.experience.EnableRaisingEvents = true;
+        }
+
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private void BringToFront(Process pTemp)
+        {
+            SetForegroundWindow(pTemp.MainWindowHandle);
         }
     }
 }
